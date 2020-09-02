@@ -1,26 +1,64 @@
-window.addEventListener("load", sidenVises);
+        let filter = "alle";
+        let personer;
+        document.addEventListener("DOMContentLoaded", loadJSON)
 
-function sidenVises() {
-    console.log(" siden vises ");
+        async function loadJSON() {
+            const JSONData = await
+            fetch("https://spreadsheets.google.com/feeds/list/17Dd7DvkPaFamNUdUKlrFgnH6POvBJXac7qyiS6zNRw0/od6/public/values?alt=json");
+            personer = await JSONData.json();
+            visPersoner();
+            addEventlistenersToButtons();
+        }
 
-    document.querySelector("#menuknap").addEventListener("click", toggleMenu);
 
+
+        function visPersoner() {
+            const templatePointer = document.querySelector("template");
+            const listPointer = document.querySelector("section");
+            listPointer.innerHTML = "";
+            personer.feed.entry.forEach(person => {
+                if (filter == "alle" || filter == person.gsx$kategori.$t) {
+                    console.log(person);
+                    const minKlon = templatePointer.cloneNode(true).content;
+                    minKlon.querySelector("h2").textContent = person.gsx$navn.$t;
+
+                    minKlon.querySelector("img").src = "imgs/small/" + person.gsx$billede.$t + "-sm.jpg";
+                    minKlon.querySelector("article").addEventListener("click", () => visDeltaljer(person));
+                    listPointer.appendChild(minKlon);
+                }
+            })
+        }
+
+
+
+function visDeltaljer(person) {
+    popop.style.display = "block";
+    popop.querySelector("h2").textContent = person.gsx$navn.$t;
+//    popop.querySelector("h2").textContent = person.gsx$efternavn.$t;
+    popop.querySelector(".lang").textContent = person.gsx$lang.$t;
+    popop.querySelector(".pris").textContent = person.gsx$pris.$t;
+//    popop.querySelector("img").src = person.gsx$billede.$t;
+   popop.querySelector("img").src = "imgs/large/" + person.gsx$billede.$t + ".jpg";
 
 }
 
 
 
-/*toggle betyder at tilføje noget der ikke er der/ eller fjerne hvis det er - hidden i dette tilfælde*/
-function toggleMenu() {
-    console.log("toggle menu ");
-    document.querySelector("#menu").classList.toggle("hidden");
+     document.querySelector("#luk").addEventListener("click", ()=>popop.style.display="none");
 
-    /*Hvis menu indeholder hidden er "let" delen sand og hvis ikke er den falsk  */
-    let erSkjult = document.querySelector("#menu").classList.contains("hidden");
+        function addEventlistenersToButtons() {
+            document.querySelectorAll(".filter").forEach((btn) => {
+                btn.addEventListener("click", filterBTNs);
 
-    if (erSkjult == true) {
-        document.querySelector("#menuknap").textContent = "☰";
+            });
+        }
 
-    } else {
-        document.querySelector("#menuknap").textContent = "X";
-    }
+        function filterBTNs() {
+            filter = this.dataset.kategori;
+            document.querySelector("h3").textContent = this.textContent;
+ document.querySelectorAll(".filter").forEach((btn) => {
+                btn.classList.remove("valgt");
+            })
+            this.classList.add("valgt");
+            visPersoner();
+        }
