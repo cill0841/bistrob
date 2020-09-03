@@ -164,6 +164,18 @@ section {
     }
 }
 
+
+@media (max-width: 850px) {
+
+
+    #popop article {
+        width: 85vw;
+    height: 100vh;
+        grid-template-rows: 1fr 1fr;
+        display: grid;
+    }
+
+}
 /*----------------------------------MEDIA QUARIES SLUT --------------------------------*/
 
 
